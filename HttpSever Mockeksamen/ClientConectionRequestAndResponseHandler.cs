@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace HttpSever_Mockeksamen
 {
-    class ClientConectionRequestAndResponseHandler
+   public class ClientConectionRequestAndResponseHandler
     {
         private TcpClient connection;
 
@@ -24,6 +24,7 @@ namespace HttpSever_Mockeksamen
             StreamWriter Swriter = null;
             StreamReader Sreader = null;
             FileStream myFileStream = null;
+
             try
             {
 
@@ -41,7 +42,7 @@ namespace HttpSever_Mockeksamen
                         Sreader = new StreamReader(ConnectionStream);
                         Swriter.AutoFlush = true;
                         Reashivedmessege = Sreader.ReadLine();
-                        
+
                         if (Reashivedmessege.StartsWith("GET") && Reashivedmessege.EndsWith("HTTP/1.1"))
                         {
 
@@ -49,7 +50,11 @@ namespace HttpSever_Mockeksamen
                             messeges = Reashivedmessege.Split(' ');
                             if (messeges[2] != null)
                             {
-                                myFileStream = new FileStream(@"C:\Users\ander\Documents\Visual Studio Apps\Små Projector\HttpSever Mockeksamen\HttpSever Mockeksamen\" + messeges[1].Trim('/'), FileMode.Open);
+
+                                myFileStream =
+                                    new FileStream(
+                                        @"C:\Users\ander\Documents\Visual Studio Apps\Små Projector\HttpSever Mockeksamen\HttpSever Mockeksamen\" +
+                                        messeges[1].Trim('/'), FileMode.Open);
                                 myFileStream.CopyTo(Swriter.BaseStream);
 
                                 byte[] bytes = new byte[128];
@@ -62,6 +67,10 @@ namespace HttpSever_Mockeksamen
                         {
                             Swriter.WriteLine("400 bad request");
                         }
+                    }
+                    catch (FileNotFoundException)
+                    {
+                        Swriter.WriteLine("400 bad request");
                     }
                     catch (IndexOutOfRangeException)
                     {
