@@ -37,16 +37,15 @@ namespace HttpSever_Mockeksamen
                         ConnectionStream = connection.GetStream();
                         Swriter = new StreamWriter(ConnectionStream);
                         Sreader = new StreamReader(ConnectionStream);
-                        Swriter.AutoFlush = true;
-
+                        Swriter.AutoFlush = true;                      
                         Reashivedmessege = Sreader.ReadLine();
 
                         if (Reashivedmessege.StartsWith("GET") && Reashivedmessege.EndsWith("HTTP/1.1"))
                         {
-                            Swriter.WriteLine("Hello World");
-
-                            Reashivedmessege = "stop";
-
+                            string[] messeges = new string[3];
+                            messeges = Reashivedmessege.Split(' ');
+                            if (messeges[3] != null) Swriter.WriteLine(messeges[2]);
+                            else Swriter.WriteLine("400 bad request");
                         }
                         else
                         {
@@ -56,6 +55,7 @@ namespace HttpSever_Mockeksamen
                     catch (IndexOutOfRangeException)
                     {
                         Swriter.WriteLine("400 bad request");
+
                     }
 
                     finally
@@ -63,6 +63,7 @@ namespace HttpSever_Mockeksamen
                         if (Swriter != null) Swriter.Close();
                         if (Sreader != null) Sreader.Close();
                         if (ConnectionStream != null) ConnectionStream.Close();
+                        Reashivedmessege = "stop";
                     }
 
 
@@ -71,7 +72,8 @@ namespace HttpSever_Mockeksamen
             catch (Exception e)
             {
 
-                throw e;
+                Console.WriteLine(e.ToString());
+                Console.WriteLine(e.Message);
             }
 
             finally
