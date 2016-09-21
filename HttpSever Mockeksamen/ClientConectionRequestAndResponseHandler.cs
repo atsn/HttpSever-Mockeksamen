@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
@@ -22,6 +23,7 @@ namespace HttpSever_Mockeksamen
             Stream ConnectionStream = null;
             StreamWriter Swriter = null;
             StreamReader Sreader = null;
+            FileStream myFileStream = null;
             try
             {
 
@@ -37,15 +39,24 @@ namespace HttpSever_Mockeksamen
                         ConnectionStream = connection.GetStream();
                         Swriter = new StreamWriter(ConnectionStream);
                         Sreader = new StreamReader(ConnectionStream);
-                        Swriter.AutoFlush = true;                      
+                        Swriter.AutoFlush = true;
                         Reashivedmessege = Sreader.ReadLine();
-
+                        
                         if (Reashivedmessege.StartsWith("GET") && Reashivedmessege.EndsWith("HTTP/1.1"))
                         {
+
                             string[] messeges = new string[3];
                             messeges = Reashivedmessege.Split(' ');
-                            if (messeges[3] != null) Swriter.WriteLine(messeges[2]);
+                            if (messeges[2] != null)
+                            {
+                                myFileStream = new FileStream(@"C:\Users\ander\Documents\Visual Studio Apps\Små Projector\HttpSever Mockeksamen\HttpSever Mockeksamen\" + messeges[1].Trim('/'), FileMode.Open);
+                                myFileStream.CopyTo(Swriter.BaseStream);
+
+                                byte[] bytes = new byte[128];
+                                Swriter.BaseStream.Write(bytes, 0, 128);
+                            }
                             else Swriter.WriteLine("400 bad request");
+
                         }
                         else
                         {
@@ -63,6 +74,7 @@ namespace HttpSever_Mockeksamen
                         if (Swriter != null) Swriter.Close();
                         if (Sreader != null) Sreader.Close();
                         if (ConnectionStream != null) ConnectionStream.Close();
+                        if (myFileStream != null) myFileStream.Close();
                         Reashivedmessege = "stop";
                     }
 
